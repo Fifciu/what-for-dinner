@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String
+  password String 
+  userRoles UserInGroupRoles[]
+}
+
+model Group {
+  id Int @id @default(autoincrement())
+  name String
+  userRoles UserInGroupRoles[]
+  dishes Dish[]
+}
+
+enum UserInGroupRole {
+  CHEF
+  USER
+}
+
+model UserInGroupRoles {
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  group Group @relation(fields: [groupId], references: [id])
+  groupId Int
+  role UserInGroupRole @default(USER)
+}
+
+model Dish {
+  id Int @id @default(autoincrement())
+  group Group @relation(fields: [groupId], references: [id])
+  groupId Int
+  name String
+  photoSrc String
+}

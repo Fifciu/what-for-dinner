@@ -1,0 +1,42 @@
+version: '3.9'
+services:
+  nginx:
+    image: nginx
+    container_name: wfd-nginx-reverse-proxy
+    volumes:
+    - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    # Uncomment extra hosts below if you are using Linux OS, on OSX and Windows it should work OOTB
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+    ports:
+      - "80:80"
+
+  postgres16:
+    image: postgres
+    container_name: wfd-postgres
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - ./db:/var/lib/postgresql16/data
+    environment:
+      - POSTGRES_PASSWORD=zaq1@WSX
+      - POSTGRES_USER=user
+      - POSTGRES_DB=whatfordinner
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: wfd-postgres-pgadmin
+    depends_on:
+      - postgres16
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
+      PGADMIN_DEFAULT_PASSWORD: strong-password
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  pgadmin-data:
