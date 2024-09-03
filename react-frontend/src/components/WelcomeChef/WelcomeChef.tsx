@@ -4,7 +4,7 @@ import classes from './Welcome.module.css';
 export function WelcomeChef() {
   return (
     <>
-      <Title className={classes.title} ta="center" mt={100}>
+      <Title className={classes.title} ta="center">
         Hello{' '}
         <Text inherit variant="gradient" component="span" gradient={{ from: 'pink', to: 'yellow' }}>
           Chef

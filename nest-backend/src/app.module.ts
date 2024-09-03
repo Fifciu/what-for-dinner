@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DbModule } from './db/db.module';
 import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { DishesModule } from './dishes/dishes.module';
 import * as Joi from '@hapi/joi';
 
 @Module({
@@ -22,6 +23,7 @@ import * as Joi from '@hapi/joi';
     DbModule,
     AuthenticationModule,
     UsersModule,
+    DishesModule,
   ],
   controllers: [],
   providers: [],

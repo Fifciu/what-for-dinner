@@ -31,7 +31,7 @@ export function ChefPage() {
   return (
     <>
       <WelcomeChef />
-      <Container px={0} size="30rem" mt="lg">
+      <Container px="16px" size="30rem" mt="lg">
         <Flex
           direction={{ base: 'column' }}
           gap={{ base: 'sm' }}
@@ -40,7 +40,7 @@ export function ChefPage() {
           <Button variant="filled" onClick={onSelectDinnerClick}>{hasPlannedDinner ? 'Zmień obiad' : 'Wybierz obiad'}</Button>
           <Button variant="filled" onClick={onSelectCreatePoll}>{hasPlannedDinner ? 'Zrób nowe głosowanie' : 'Zrób głosowanie'}</Button>
           <Divider my="xl" />
-          <Button variant="filled">Zarządzaj zbiorem dań</Button>
+          <Button variant="filled" onClick={() => navigate('/dishes')}>Zarządzaj zbiorem dań</Button>
           <Button variant="filled" onClick={() => navigate('/')}>Wyloguj sie</Button>
         </Flex>
       </Container>
