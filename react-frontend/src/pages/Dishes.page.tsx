@@ -1,12 +1,50 @@
-import { Text, Grid, Card, Image, Group, TextInput, Button, Container, Flex } from '@mantine/core';
+import { Text, Grid, FileInput, Modal, Card, Image, Group, TextInput, Button, Container, Flex } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useDisclosure } from '@mantine/hooks';
+import { useForm } from '@mantine/form';
 import { WelcomeChef } from '../components/WelcomeChef/WelcomeChef';
 import { endpointUrl } from '@/api/endpointUrl';
 import { useApiDishes } from '../hooks/useApiDishes';
 
 const notOkMsg = "Couldn't fetch dishes from requested group";
+
+function AddDishForm() {
+  const form = useForm({
+    mode: 'uncontrolled',
+    initialValues: {
+      name: '',
+      photoSrc: '',
+    },
+  });
+
+  return (
+    <form onSubmit={form.onSubmit((values: any) => console.log(values))}>
+      <Flex
+        direction={{ base: 'column' }}
+        gap={{ base: 'sm' }}>
+      <TextInput
+        withAsterisk
+        label="Name"
+        placeholder="Rosół"
+        key={form.key('name')}
+        {...form.getInputProps('name')}
+      />
+
+      <FileInput
+        variant="filled"
+        label="Photo"
+        withAsterisk
+        placeholder="Click to select photo"
+      />
+      </Flex>
+      <Group justify="flex-end" mt="md">
+        <Button type="submit">Add</Button>
+      </Group>
+    </form>
+  );
+}
 
 function Dish({ dish, groupId }: any) {
   const { deleteById } = useApiDishes(groupId);
@@ -86,6 +124,8 @@ export function DishesPage() {
     },
   });
 
+  const [openedAddModal, { open: openAddModal, close: closeAddModal }] = useDisclosure(false);
+
   return (
     <>
       <WelcomeChef />
@@ -94,7 +134,10 @@ export function DishesPage() {
           direction={{ base: 'column' }}
           gap={{ base: 'sm' }}
         >
-          <Button color="green" fullWidth mt="md" radius="md">
+          <Modal opened={openedAddModal} onClose={closeAddModal} title="Add new dish" centered>
+            <AddDishForm />
+          </Modal>
+          <Button color="green" fullWidth mt="md" radius="md" onClick={openAddModal}>
             Add new
           </Button>
           <DishesList isPending={isPending} error={error} data={data} groupId={groupId} />

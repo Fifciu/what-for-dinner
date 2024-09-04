@@ -1,1 +1,4 @@
-export class CreateDishDto {}
+export class CreateDishDto {
+  name: string;
+  groupId: number;
+}

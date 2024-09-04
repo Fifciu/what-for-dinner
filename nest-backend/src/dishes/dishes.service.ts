@@ -2,13 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { UpdateDishDto } from './dto/update-dish.dto';
 import { PrismaService } from 'src/db/prisma.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class DishesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private configService: ConfigService,
+  ) {}
 
-  create(createDishDto: CreateDishDto) {
-    return 'This action adds a new dish';
+  async create(createDishDto: CreateDishDto & { photoSrc: string }) {
+    return await this.prisma.dish.create({ data: createDishDto });
   }
 
   async findByGroupId(groupId: number) {

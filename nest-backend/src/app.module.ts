@@ -4,6 +4,7 @@ import { DbModule } from './db/db.module';
 import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { DishesModule } from './dishes/dishes.module';
+import { FilesModule } from './files/files.module';
 import * as Joi from '@hapi/joi';
 
 @Module({
@@ -18,12 +19,14 @@ import * as Joi from '@hapi/joi';
         PORT: Joi.number(),
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION_TIME: Joi.string().required(),
+        UPLOADS_DIR: Joi.string().required(),
       }),
     }),
     DbModule,
     AuthenticationModule,
     UsersModule,
     DishesModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [],
