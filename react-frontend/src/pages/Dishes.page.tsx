@@ -4,10 +4,13 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { WelcomeChef } from '../components/WelcomeChef/WelcomeChef';
 import { endpointUrl } from '@/api/endpointUrl';
+import { useApiDishes } from '../hooks/useApiDishes';
 
 const notOkMsg = "Couldn't fetch dishes from requested group";
 
-function Dish({ dish }: any) {
+function Dish({ dish, groupId }: any) {
+  const { deleteById } = useApiDishes(groupId);
+
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
       <Card.Section>
@@ -29,7 +32,14 @@ function Dish({ dish }: any) {
         <Button color="blue" fullWidth mt="md" radius="md">
           Edit
         </Button>
-        <Button color="red" fullWidth mt="md" radius="md">
+        <Button
+          color="red"
+          fullWidth
+          mt="md"
+          radius="md"
+          onClick={() => {
+            deleteById.mutate(dish.id);
+        }}>
           Delete
         </Button>
       </Flex>
@@ -37,7 +47,7 @@ function Dish({ dish }: any) {
   );
 }
 
-function DishesList({ isPending, error, data }) {
+function DishesList({ isPending, error, data, groupId }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   if (isPending) return 'Loading...';
@@ -58,7 +68,7 @@ function DishesList({ isPending, error, data }) {
           onChange={(event) => setSearchQuery(event.target.value)}
         />
       </Grid.Col>
-      {dishes.map((dish: any) => <Grid.Col span={{ base: 12, sm: 6 }}><Dish dish={dish} /></Grid.Col>)}
+      {dishes.map((dish: any) => <Grid.Col span={{ base: 12, sm: 6 }} key={dish.id}><Dish dish={dish} groupId={groupId} /></Grid.Col>)}
     </Grid>
   );
 }
@@ -68,7 +78,7 @@ export function DishesPage() {
   const { isPending, error, data } = useQuery({
     queryKey: ['dishes', groupId],
     queryFn: async () => {
-      const response = await fetch(`${endpointUrl.dishes.getByGroupId(groupId)}`);
+      const response = await fetch(endpointUrl.dishes.getByGroupId(groupId));
       if (!response.ok) {
         throw new Error(notOkMsg);
       }
@@ -87,7 +97,7 @@ export function DishesPage() {
           <Button color="green" fullWidth mt="md" radius="md">
             Add new
           </Button>
-          <DishesList isPending={isPending} error={error} data={data} />
+          <DishesList isPending={isPending} error={error} data={data} groupId={groupId} />
         </Flex>
       </Container>
     </>

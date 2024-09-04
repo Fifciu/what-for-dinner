@@ -36,8 +36,8 @@ export class DishesController {
     return this.dishesService.update(+id, updateDishDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.dishesService.remove(+id);
+  @Delete(':dishId')
+  remove(@Param('dishId', ParseIntPipe) dishId: number) {
+    return this.dishesService.delete(+dishId);
   }
 }

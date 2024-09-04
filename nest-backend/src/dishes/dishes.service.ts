@@ -23,7 +23,7 @@ export class DishesService {
     return `This action updates a #${id} dish`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} dish`;
+  async delete(id: number) {
+    return await this.prisma.dish.delete({ where: { id } });
   }
 }
