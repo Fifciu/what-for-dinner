@@ -60,4 +60,9 @@ export class FilesService implements OnModuleInit {
     const filePath = this.getPathToFile(filenameWithExtension);
     return fs.readFileSync(filePath);
   }
+
+  deleteFile(filenameWithExtension: string) {
+    const filePath = this.getPathToFile(filenameWithExtension);
+    return fs.rmSync(filePath);
+  }
 }

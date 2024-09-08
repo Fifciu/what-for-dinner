@@ -11,7 +11,9 @@ export class DishesService {
     private configService: ConfigService,
   ) {}
 
-  async create(createDishDto: CreateDishDto & { photoSrc: string }) {
+  async create(
+    createDishDto: CreateDishDto & { photoSrc: string; groupId: number },
+  ) {
     return await this.prisma.dish.create({ data: createDishDto });
   }
 
@@ -19,12 +21,12 @@ export class DishesService {
     return await this.prisma.dish.findMany({ where: { groupId } });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} dish`;
+  async findOne(id: number) {
+    return await this.prisma.dish.findFirst({ where: { id } });
   }
 
-  update(id: number, updateDishDto: UpdateDishDto) {
-    return `This action updates a #${id} dish`;
+  async update(id: number, data: UpdateDishDto & { photoSrc?: string }) {
+    return await this.prisma.dish.update({ where: { id }, data });
   }
 
   async delete(id: number) {

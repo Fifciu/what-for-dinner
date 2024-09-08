@@ -12,6 +12,8 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { DishesService } from './dishes.service';
 import { CreateDishDto } from './dto/create-dish.dto';
@@ -70,12 +72,49 @@ export class DishesController {
   // }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDishDto: UpdateDishDto) {
-    return this.dishesService.update(+id, updateDishDto);
+  @UseInterceptors(FileInterceptor('photoSrc'))
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDishDto: UpdateDishDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1000 * 1000 }),
+          new FileTypeValidator({ fileType: /image\/(jpeg|png)/ }),
+        ],
+        fileIsRequired: false,
+      }),
+    )
+    file?: Express.Multer.File,
+  ) {
+    if (!updateDishDto.name && !file) {
+      throw new HttpException('Nothing to update', HttpStatus.BAD_REQUEST);
+    }
+    const dish = await this.dishesService.findOne(id);
+    if (!dish) {
+      throw new HttpException('Dish not found', HttpStatus.NOT_FOUND);
+    }
+    let filename;
+    const groupId = 1;
+    if (file) {
+      const name = updateDishDto?.name || dish.name;
+      filename = this.filesSerivce.buildDishPhotoFilename(name, file, groupId);
+      await Promise.all([
+        this.filesSerivce.savePhoto(file, filename),
+        this.filesSerivce.deleteFile(dish.photoSrc),
+      ]);
+    }
+
+    return this.dishesService.update(id, {
+      ...updateDishDto,
+      ...(filename ? { photoSrc: filename } : {}),
+    });
   }
 
   @Delete(':dishId')
-  remove(@Param('dishId', ParseIntPipe) dishId: number) {
-    return this.dishesService.delete(+dishId);
+  async remove(@Param('dishId', ParseIntPipe) dishId: number) {
+    const dish = await this.dishesService.delete(+dishId);
+    this.filesSerivce.deleteFile(dish.photoSrc); // TODO: Maybe it should be transactional
+    return dish;
   }
 }
