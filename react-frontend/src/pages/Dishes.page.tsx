@@ -1,5 +1,4 @@
 import { Text, Grid, FileInput, Modal, Card, Image, Group, TextInput, Button, Container, Flex } from '@mantine/core';
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useDisclosure } from '@mantine/hooks';
@@ -10,7 +9,58 @@ import { useApiDishes } from '../hooks/useApiDishes';
 
 const notOkMsg = "Couldn't fetch dishes from requested group";
 
-function AddDishForm() {
+function EditDishForm({ dish, closeModal }: { closeModal: Function } & { dish: { id: number, name: string, photoSrc: string } }) {
+  const groupId = 1;
+  const { edit } = useApiDishes(groupId);
+  const form = useForm({
+    mode: 'uncontrolled',
+    initialValues: {
+      name: dish.name,
+      photoSrc: dish.photoSrc,
+    },
+  });
+
+  async function handleSubmit(values: any) {
+    await edit.mutateAsync({
+      dishId: dish.id,
+      ...values,
+    });
+    closeModal();
+  }
+
+  return (
+    <form onSubmit={form.onSubmit(handleSubmit)}>
+      <Flex
+        direction={{ base: 'column' }}
+        gap={{ base: 'sm' }}>
+      <TextInput
+        withAsterisk
+        label="Name"
+        placeholder="Rosół"
+        key={form.key('name')}
+        {...form.getInputProps('name')}
+      />
+      <img src={dish.photoSrc} alt="dish" />
+      <FileInput
+        variant="filled"
+        label="Photo"
+        withAsterisk
+        placeholder="Click to select photo"
+        key={form.key('photoSrc')}
+        accept=".png,.jpg"
+        {...form.getInputProps('photoSrc')}
+      />
+      </Flex>
+      <Group justify="flex-end" mt="md">
+        <Button type="submit" disabled={edit.isPending}>Edit</Button>
+      </Group>
+    </form>
+  );
+}
+
+function AddDishForm({ closeModal }: { closeModal: Function }) {
+  const groupId = 1;
+  const { add } = useApiDishes(groupId);
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -19,8 +69,13 @@ function AddDishForm() {
     },
   });
 
+  async function handleSubmit(values: any) {
+    await add.mutateAsync(values);
+    closeModal();
+  }
+
   return (
-    <form onSubmit={form.onSubmit((values: any) => console.log(values))}>
+    <form onSubmit={form.onSubmit(handleSubmit)}>
       <Flex
         direction={{ base: 'column' }}
         gap={{ base: 'sm' }}>
@@ -37,16 +92,19 @@ function AddDishForm() {
         label="Photo"
         withAsterisk
         placeholder="Click to select photo"
+        key={form.key('photoSrc')}
+        accept=".png,.jpg"
+        {...form.getInputProps('photoSrc')}
       />
       </Flex>
       <Group justify="flex-end" mt="md">
-        <Button type="submit">Add</Button>
+        <Button type="submit" disabled={add.isPending}>Add</Button>
       </Group>
     </form>
   );
 }
 
-function Dish({ dish, groupId }: any) {
+function Dish({ dish, groupId, onClickEditDish }: any) {
   const { deleteById } = useApiDishes(groupId);
 
   return (
@@ -67,7 +125,7 @@ function Dish({ dish, groupId }: any) {
         direction={{ base: 'row' }}
         gap={{ base: '8px' }}
       >
-        <Button color="blue" fullWidth mt="md" radius="md">
+        <Button color="blue" fullWidth mt="md" radius="md" onClick={() => onClickEditDish(dish)}>
           Edit
         </Button>
         <Button
@@ -85,7 +143,7 @@ function Dish({ dish, groupId }: any) {
   );
 }
 
-function DishesList({ isPending, error, data, groupId }) {
+function DishesList({ isPending, error, data, groupId, onClickEditDish }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   if (isPending) return 'Loading...';
@@ -106,7 +164,7 @@ function DishesList({ isPending, error, data, groupId }) {
           onChange={(event) => setSearchQuery(event.target.value)}
         />
       </Grid.Col>
-      {dishes.map((dish: any) => <Grid.Col span={{ base: 12, sm: 6 }} key={dish.id}><Dish dish={dish} groupId={groupId} /></Grid.Col>)}
+      {dishes.map((dish: any) => <Grid.Col span={{ base: 12, sm: 6 }} key={dish.id}><Dish dish={dish} groupId={groupId} onClickEditDish={onClickEditDish} /></Grid.Col>)}
     </Grid>
   );
 }
@@ -125,6 +183,13 @@ export function DishesPage() {
   });
 
   const [openedAddModal, { open: openAddModal, close: closeAddModal }] = useDisclosure(false);
+  const [editDish, setEditDish] = useState();
+  const [openedEditModal, { open: openEditModal, close: closeEditModal }] = useDisclosure(false);
+
+  function onClickEditDish(dish: any) {
+    setEditDish(dish);
+    openEditModal();
+  }
 
   return (
     <>
@@ -135,12 +200,15 @@ export function DishesPage() {
           gap={{ base: 'sm' }}
         >
           <Modal opened={openedAddModal} onClose={closeAddModal} title="Add new dish" centered>
-            <AddDishForm />
+            <AddDishForm closeModal={closeAddModal} />
+          </Modal>
+          <Modal opened={openedEditModal} onClose={closeEditModal} title="Edit new dish" centered>
+            <EditDishForm closeModal={closeEditModal} dish={editDish} />
           </Modal>
           <Button color="green" fullWidth mt="md" radius="md" onClick={openAddModal}>
             Add new
           </Button>
-          <DishesList isPending={isPending} error={error} data={data} groupId={groupId} />
+          <DishesList isPending={isPending} error={error} data={data} groupId={groupId} onClickEditDish={onClickEditDish} />
         </Flex>
       </Container>
     </>

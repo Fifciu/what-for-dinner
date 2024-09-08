@@ -1,9 +1,15 @@
 import { Dish, PrismaClient, UserInGroupRole } from '@prisma/client';
 import { compare, hash } from 'bcrypt';
-import { group } from 'console';
+import * as fs from 'fs';
 
 const prisma = new PrismaClient();
 const SALT_OR_ROUNDS = 10;
+
+const photos = [
+  './prisma/images/grymas.png',
+  './prisma/images/oczy.png',
+  './prisma/images/hamburger.jpg',
+];
 
 async function createUserAndAssignToGroup({ email, name }, groupId: number) {
   const user = await prisma.user.create({
@@ -96,8 +102,17 @@ function dishesFactory(groupId: number): Array<Omit<Dish, 'id'>> {
 async function main() {
   const { group, users } = await createGroupAndUsers();
   const dishes = dishesFactory(group.id);
+  let i = 0;
   for (const dish of dishes) {
-    await createDish(dish);
+    const photo = photos[i % 3];
+    const ext = photo.split('.').pop();
+    const filename = `photo-${i}.${ext}`;
+    await fs.copyFileSync(photos[i % 3], `./uploads/${filename}`);
+    await createDish({
+      ...dish,
+      photoSrc: filename,
+    });
+    i++;
   }
 }
 
