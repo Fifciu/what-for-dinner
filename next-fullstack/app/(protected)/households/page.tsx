@@ -38,17 +38,21 @@ import {
 // import { zodResolver } from "@hookform/resolvers/zod";
 import { HouseholdsList } from "./households-list";
 import { AddHousehold } from "./household-add";
+import { HouseholdsListInvitations } from "./households-list-invitations";
 
 export default function HouseholdsPage() {
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
-      <div className="flex flex-col gap-2 items-start w-full">
+      <div className="flex flex-col gap-12 items-start w-full">
         <HouesholdsProvider>
+          <div className="w-full flex flex-col items-start">
           <div className="w-full flex justify-between items-center">
-            <h2 className="font-bold text-2xl mb-4">Households</h2>
+            <h2 className="font-bold text-2xl">Households</h2>
             <AddHousehold />
           </div>
           <HouseholdsList />
+          </div>
+          <HouseholdsListInvitations />
         </HouesholdsProvider>
       </div>
     </div>
