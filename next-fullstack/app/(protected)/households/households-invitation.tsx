@@ -1,23 +1,13 @@
 'use client'
 
-import { createClient } from "@/lib/supabase/server";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { getUser } from "@/lib/supabase/get-user";
-import { AlertCircleIcon, CheckCircle2Icon, PopcornIcon } from "lucide-react";
+import { CheckCircle2Icon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { acceptInvitation, buildChangeInvitationStatus, rejectInvitation } from "./actions";
+import { acceptInvitation, rejectInvitation } from "./actions";
 import { useActionState } from "react";
+import { Household } from "./types";
 
-export function Invitation({ household }: { household: any }) {
+export function Invitation({ household }: { household: Household }) {
   const [stateAccInv, acceptInvitationAction, isPendingAccInv] = useActionState(
     acceptInvitation,
     { error: '' }

@@ -1,5 +1,4 @@
 "use client";
-import { useHouseholds } from "@/hooks/useHouseholds";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,12 +23,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { formSchema } from "./household-add.schema";
 import { addHousehold } from "./actions";
 import { HouseholdAddSubmitBtn } from "./household-add-submit-btn";
-import { useActionState } from "react";
-import { AlertCircleIcon, CheckCircle2Icon, PopcornIcon } from "lucide-react";
+import React, { useActionState } from "react";
+import { AlertCircleIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
 
-export function AddHousehold() {
-  // const { addHousehold, isAdding, error } = useHouseholds();
+type AddHouseholdProps = {
+  hasOwnHousehold: boolean
+}
+
+export function AddHousehold({ hasOwnHousehold }: AddHouseholdProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,18 +47,24 @@ export function AddHousehold() {
   });
   const [state, formAction] = useActionState(addHousehold, { error: "" });
 
-  // async function onSubmit(values: z.infer<typeof formSchema>) {
-  //   await addHousehold(values);
-  //   if (error) {
-  //     alert(error?.message || error);
-  //   }
-  //   return;
-  // }
+  function AddHouseholdButton({...props}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+      if (hasOwnHousehold) {
+        return <Tooltip>
+          <TooltipTrigger className="cursor-not-allowed" {...props} disabled={true}>
+            Create
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>One household per user</p>
+          </TooltipContent>
+        </Tooltip>;
+      }
+      return <Button {...props}>Create</Button>
+    }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Create</Button>
+        <AddHouseholdButton />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

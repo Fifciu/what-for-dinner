@@ -13,6 +13,8 @@ export default {
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        sidebar: 'oklch(.205 0 0)',
+        border: 'oklch(1 0 0/10%)',
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",

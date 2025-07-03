@@ -1,68 +1,48 @@
-import { createClient } from "@/lib/supabase/server";
+import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Card,
+  CardAction,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
+import { Household } from './types';
 import { getUser } from "@/lib/supabase/get-user";
 
-export async function HouseholdsList() {
+export async function HouseholdsList({ households }: { households: Household[] }) {
   const user = await getUser();
-  const supabase = await createClient();
-  if (!user) {
-    return;
-  }
-  const { data: foreignHouseholds, error: errForeignHouseholds } =
-    await supabase
-      .from("households")
-      .select(
-        `
-    *,
-    household_members!inner(*)
-  `
-      )
-      .eq("household_members.status", "accepted")
-      .eq("household_members.user_id", user.id);
-  if (errForeignHouseholds) {
-    return <div>error try again later</div>;
-  }
-
-  const { data: ownHouseholds, error: errOwnHouseholds } = await supabase
-    .from("households")
-    .select()
-    .eq("owner_id", user.id);
-  if (errOwnHouseholds) {
-    return <div>error try again later</div>;
-  }
-
-  const households = [...ownHouseholds, ...foreignHouseholds];
 
   return (
-    <div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Name</TableHead>
-            <TableHead>City</TableHead>
-            <TableHead className="text-right">Is owner?</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {households?.map((household) => (
-            <TableRow key={household.id}>
-              <TableCell className="font-medium">{household.name}</TableCell>
-              <TableCell>{household.city}</TableCell>
-              <TableCell>
-                {household.owner_id === user?.id ? "YES" : "NO"}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+      <div className="flex flex-col gap-4">
+        {households?.map((household) => (
+          <Link href={`/household/${household.id}`} key={household.name + household.city}>
+          <Card
+            className="@container/card"
+          >
+            <CardHeader>
+              <CardDescription>{household.city}</CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                {household.name}
+              </CardTitle>
+              <CardAction>
+                <Badge variant="outline">
+                  {household.owner_id === user?.id ? "Owner" : "Guest"}
+                </Badge>
+              </CardAction>
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+              <div className="line-clamp-1 flex gap-2 font-medium">
+                Voting not started
+              </div>
+              <div className="text-muted-foreground">
+                Pick up dishes and initiate voting as you are an owner
+              </div>
+            </CardFooter>
+          </Card>
+          </Link>
+        ))}
+      </div>
   );
 }

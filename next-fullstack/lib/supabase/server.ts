@@ -1,11 +1,11 @@
+import { Database } from "@/database.types";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { cache } from "react";
 
-async function privateCreateClient() {
+export async function createClient() {
   const cookieStore = await cookies();
 
-  return createServerClient(
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -28,7 +28,3 @@ async function privateCreateClient() {
     }
   );
 }
-
-export const createClient = cache(async () => {
-  return await privateCreateClient();
-});
