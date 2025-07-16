@@ -38,7 +38,6 @@ export function NavPersonal({
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Personal</SidebarGroupLabel>
       <SidebarMenu>
         {personal.map((item) => (
           <SidebarMenuItem key={item.name}>

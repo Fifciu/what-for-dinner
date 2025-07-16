@@ -70,7 +70,7 @@ const buildChangeInvitationStatus = (
         status: newStatus,
       })
       .eq("user_id", user.id)
-      .eq("household_id", householdId);
+      .eq("household_id", Number(householdId));
 
     if (error) {
       console.error(error);

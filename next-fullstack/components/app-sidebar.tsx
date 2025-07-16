@@ -2,15 +2,11 @@
 
 import * as React from "react"
 import {
-  BookOpen,
   Bot,
   Command,
   Frame,
-  Settings2,
-  SquareTerminal,
 } from "lucide-react"
 
-import { NavMain } from "@/components/nav-main"
 import { NavPersonal } from "@/components/nav-personal"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
@@ -24,12 +20,12 @@ import {
 import { getUser } from "@/lib/supabase/get-user"
 import { Tables } from "@/database.types"
 
-// This is sample data.
-const data = {
-  personal: [
+const buildSidebarItems = (householdId: number) => {
+  const baseUrl = `/household/${householdId}`;
+return [
     {
       name: "Dinners",
-      url: "#",
+      url: baseUrl,
       icon: Bot
     },
     {
@@ -39,7 +35,7 @@ const data = {
     },
     {
       name: "My dishes",
-      url: "#",
+      url: `${baseUrl}/dishes`,
       icon: Frame,
     },
     {
@@ -47,8 +43,8 @@ const data = {
       url: "#",
       icon: Frame,
     },
-  ],
-}
+  ]
+};
 
 type AppSidebarProps = {
   user: Exclude<Awaited<ReturnType<typeof getUser>>, null>,
@@ -86,13 +82,15 @@ export function AppSidebar({ appSidebar, ...props }: React.ComponentProps<typeof
     })),
   ].filter(v => !!v);
 
+  const sidebarItems = buildSidebarItems(currentHousehold.id);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavPersonal personal={data.personal} />
+        <NavPersonal personal={sidebarItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

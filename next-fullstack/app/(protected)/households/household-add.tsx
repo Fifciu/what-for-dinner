@@ -22,7 +22,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formSchema } from "./household-add.schema";
 import { addHousehold } from "./actions";
-import { HouseholdAddSubmitBtn } from "./household-add-submit-btn";
 import React, { useActionState } from "react";
 import { AlertCircleIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -32,6 +31,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { FormSubmitBtn } from "@/components/form-submit-btn";
 
 type AddHouseholdProps = {
   hasOwnHousehold: boolean
@@ -113,7 +113,7 @@ export function AddHousehold({ hasOwnHousehold }: AddHouseholdProps) {
               </Alert>
               </div>
             )}
-            <HouseholdAddSubmitBtn />
+            <FormSubmitBtn pendingLabel="Adding..." idleLabel="Submit" />
           </form>
         </Form>
       </DialogContent>

@@ -5,7 +5,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getUser } from "@/lib/supabase/get-user";
 import Breadcrumbs from "./breadcrumbs";
 import { getMyHouseholds } from "@/lib/supabase/get-my-households";
@@ -25,6 +25,9 @@ export default async function Layout({
   const { error, households } = await getMyHouseholds();
   if (error) {
     return <div>{error}</div>
+  }
+  if (!households?.find((household) => household.id === Number(currentHouseholdId))) {
+    notFound()
   }
 
   return (

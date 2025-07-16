@@ -5,9 +5,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { acceptInvitation, rejectInvitation } from "./actions";
 import { useActionState } from "react";
-import { Household } from "./types";
+import { Tables } from "@/database.types";
 
-export function Invitation({ household }: { household: Household }) {
+export function Invitation({ household }: { household: Tables<"households"> }) {
   const [stateAccInv, acceptInvitationAction, isPendingAccInv] = useActionState(
     acceptInvitation,
     { error: '' }
